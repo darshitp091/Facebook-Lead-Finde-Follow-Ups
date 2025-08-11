@@ -1,0 +1,198 @@
+{
+  "name": "Instant Lead Capture & Follow-Up",
+  "nodes": [
+    {
+      "parameters": {
+        "page": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "form": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.facebookLeadAdsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b2f044b2-475c-46f8-abbb-ef4dd1008264",
+      "name": "Facebook Lead Ads Trigger",
+      "webhookId": "f5659ced-e7ad-48e1-873c-c9f9f55ad186"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1zNqPC6E_FKm0KX5xsxDHfAzBPBWAloGy3DCQUlP1OqM",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        192,
+        0
+      ],
+      "id": "950556c0-c8b8-4540-acdf-72678b56f85d",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OQPzYVXVpuLghT8W",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        192
+      ],
+      "id": "5b44f305-b67b-4f44-b5ed-927142640a7c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        32,
+        224
+      ],
+      "id": "b1b45dcf-4c53-4093-935f-0bd1767c8137",
+      "name": "Send a message",
+      "webhookId": "9bcdc2a5-05ae-47e9-ae36-3a419282374b"
+    },
+    {
+      "parameters": {
+        "content": "📌 Setup Instructions:\n1. Create a Facebook App in Meta for Developers.\n2. In n8n, open this node → Add Credential → Select \"Facebook Lead Ads\".\n3. Login to your Facebook account and authorize n8n.\n4. Select your Page and the Lead Form you want to connect.\n5. Test with \"Execute Node\" to confirm it’s pulling leads.",
+        "height": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -256,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "ebab0b7d-c0bd-4f19-abca-3901f3368812",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "📌 Setup Instructions:\n1. Create a Google Sheet with columns: Name | Email | Service | Date.\n2. In n8n, select \"Append Row\" operation.\n3. Add Credential → Choose OAuth2 (Google).\n   - Click \"Connect\" → Sign into Google → Allow access.\n4. Select your spreadsheet and worksheet.\n5. Map the fields from Facebook Lead Ads to the correct sheet columns.\n",
+        "height": 352,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        304,
+        -320
+      ],
+      "typeVersion": 1,
+      "id": "a0df5f1b-b31f-4c97-9b7d-30cf49dcf133",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "📌 Setup Instructions:\n1. Select Method: POST.\n2. URL: https://openrouter.ai/api/v1/chat/completions\n3. Under Headers:\n   - Authorization: Bearer YOUR_OPENROUTER_API_KEY\n   - Content-Type: application/json\n4. Under Body (JSON):\n{\n  \"model\": \"DeepSeek:R1\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a helpful assistant that writes friendly, concise business emails.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Write a friendly email to {{$json[\\\"name\\\"]}} about {{$json[\\\"service\\\"]}}.\"\n    }\n  ]\n}\n5. Test to ensure AI returns an email message.\n",
+        "height": 480,
+        "width": 496,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        384,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "c510aaab-c80d-4c21-a36f-04cab8b6bd19",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "📌 Setup Instructions:\n1. Operation: Send Email.\n2. Add Gmail Credential → OAuth2 → Sign into Google → Allow access.\n3. To: {{$json[\"email\"]}}  (from Facebook Lead Ads data)\n4. Subject: Your Free Consultation with {{ $json[\"service\"] }}\n5. Body: {{$node[\"HTTP Request\"].json[\"choices\"][0][\"message\"][\"content\"]}}\n6. Test by sending to your own email first.\n",
+        "height": 336,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -256,
+        208
+      ],
+      "typeVersion": 1,
+      "id": "4d569356-26a3-4b5c-bf9a-ccd6f1d26cc9",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Facebook Lead Ads Trigger": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c05b4b34-0be5-4690-be67-0bc021a9026b",
+  "meta": {
+    "instanceId": "62e5776193aec570f532cdd8c15c6055f370871bdbc707c24c5e70e3eace70e7"
+  },
+  "id": "sISocVKgpqsB7lWc",
+  "tags": []
+}
